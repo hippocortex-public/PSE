@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Service Backend (Node.js + Express)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pse-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongodb:27017/pse-app
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongodb
+    networks:
+      - pse-network
+    restart: unless-stopped
+
+  # Service Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pse-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - pse-network
+    restart: unless-stopped
+
+  # Service Base de données (MongoDB)
+  mongodb:
+    image: mongo:6
+    container_name: pse-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=pse-app
+    networks:
+      - pse-network
+    restart: unless-stopped
+
+# Volumes pour la persistance des données
+volumes:
+  mongodb_data:
+
+# Réseau pour la communication entre les services
+networks:
+  pse-network:
+    driver: bridge
