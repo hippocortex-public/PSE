@@ -51,6 +51,21 @@ services:
       - pse-network
     restart: unless-stopped
 
+  # Reverse Proxy Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: pse-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - pse-network
+    restart: unless-stopped
+
 # Volumes pour la persistance des données
 volumes:
   mongodb_data:
