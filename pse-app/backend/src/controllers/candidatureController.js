@@ -6,14 +6,28 @@ const createCandidature = async (req, res) => {
   try {
     const { titre_poste, entreprise_id, nom_entreprise, url_offre, date_candidature, statut, notes } = req.body;
 
+    // Validation des champs obligatoires
+    if (!titre_poste || titre_poste.trim() === '') {
+      return res.status(400).json({ message: 'Le titre du poste est obligatoire' });
+    }
+    
+    if (!url_offre || url_offre.trim() === '') {
+      return res.status(400).json({ message: 'Le lien de l\'offre est obligatoire' });
+    }
+    
+    // Vérifier qu'une entreprise est fournie (soit ID, soit nom)
+    if (!entreprise_id && !nom_entreprise) {
+      return res.status(400).json({ message: 'Une entreprise est obligatoire (ID ou nom)' });
+    }
+
     let entreprise;
     
     // Si un nom d'entreprise est fourni, créer une nouvelle entreprise
-    if (nom_entreprise) {
+    if (nom_entreprise && nom_entreprise.trim() !== '') {
       // Vérifier si une entreprise avec ce nom existe déjà
-      entreprise = await Entreprise.findOne({ nom: nom_entreprise });
+      entreprise = await Entreprise.findOne({ nom: nom_entreprise.trim() });
       if (!entreprise) {
-        entreprise = new Entreprise({ nom: nom_entreprise });
+        entreprise = new Entreprise({ nom: nom_entreprise.trim() });
         await entreprise.save();
       }
     } else {
@@ -25,12 +39,12 @@ const createCandidature = async (req, res) => {
     }
 
     const nouvelleCandidature = new Candidature({
-      titre_poste,
+      titre_poste: titre_poste.trim(),
       entreprise_id: entreprise._id,
-      url_offre,
+      url_offre: url_offre.trim(),
       date_candidature: date_candidature || new Date(),
       statut: statut || 'Envoyé',
-      notes,
+      notes: notes ? notes.trim() : '',
       historique_statut: statut ? [
         {
           ancien_statut: null,
@@ -44,7 +58,10 @@ const createCandidature = async (req, res) => {
     await nouvelleCandidature.save();
     res.status(201).json(nouvelleCandidature);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Erreur lors de la création de la candidature:', error);
+    res.status(400).json({ 
+      message: error.message || 'Erreur lors de la création de la candidature' 
+    });
   }
 };
 

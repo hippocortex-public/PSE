@@ -96,9 +96,34 @@ function CandidatureForm() {
       
       // Si on utilise une nouvelle entreprise, envoyer nom_entreprise au lieu de entreprise_id
       if (useNewEntreprise) {
+        // Vérifier que nom_entreprise est fourni
+        if (!candidatureData.nom_entreprise || candidatureData.nom_entreprise.trim() === '') {
+          setError('Veuillez entrer un nom pour la nouvelle entreprise');
+          setLoading(false);
+          return;
+        }
         delete candidatureData.entreprise_id;
       } else {
+        // Vérifier que entreprise_id est fourni
+        if (!candidatureData.entreprise_id || candidatureData.entreprise_id.trim() === '') {
+          setError('Veuillez sélectionner une entreprise');
+          setLoading(false);
+          return;
+        }
         delete candidatureData.nom_entreprise;
+      }
+      
+      // Vérifier que tous les champs obligatoires sont présents
+      if (!candidatureData.titre_poste || candidatureData.titre_poste.trim() === '') {
+        setError('Le titre du poste est obligatoire');
+        setLoading(false);
+        return;
+      }
+      
+      if (!candidatureData.url_offre || candidatureData.url_offre.trim() === '') {
+        setError('Le lien de l\'offre est obligatoire');
+        setLoading(false);
+        return;
       }
       
       if (id) {
@@ -108,7 +133,8 @@ function CandidatureForm() {
       }
       navigate(id ? `/candidatures/${id}` : '/');
     } catch (err) {
-      setError(err.message || 'Erreur lors de la sauvegarde');
+      console.error('Erreur détaillée:', err);
+      setError(err.message || err.response?.data?.message || 'Erreur lors de la sauvegarde');
     } finally {
       setLoading(false);
     }
@@ -145,10 +171,11 @@ function CandidatureForm() {
             <div className="flex" style={{ gap: '10px', alignItems: 'center' }}>
               <select
                 id="entreprise"
-                name="entreprise"
+                name="entreprise_id"
                 value={useNewEntreprise ? 'nouvelle' : formData.entreprise_id}
                 onChange={handleEntrepriseChange}
                 style={{ flex: 1 }}
+                required={!useNewEntreprise}
               >
                 <option value="">Sélectionnez une entreprise existante</option>
                 {entreprises.map(entreprise => (
@@ -166,7 +193,7 @@ function CandidatureForm() {
                   value={formData.nom_entreprise}
                   onChange={handleChange}
                   placeholder="Nom de la nouvelle entreprise"
-                  required
+                  required={useNewEntreprise}
                   style={{ flex: 2 }}
                 />
               )}
