@@ -248,7 +248,7 @@ function CandidatureDetail() {
                 </div>
                 <div>
                   <a
-                    href={doc.url_complete || `/api${doc.chemin_fichier}`}
+                    href={`/api${doc.chemin_fichier}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-secondary"
