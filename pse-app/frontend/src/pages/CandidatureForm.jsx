@@ -8,6 +8,7 @@ function CandidatureForm() {
   const [formData, setFormData] = useState({
     titre_poste: '',
     entreprise_id: '',
+    nom_entreprise: '',
     url_offre: '',
     date_candidature: new Date().toISOString().split('T')[0],
     statut: 'Envoyé',
@@ -16,6 +17,7 @@ function CandidatureForm() {
   const [entreprises, setEntreprises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [useNewEntreprise, setUseNewEntreprise] = useState(false);
 
   useEffect(() => {
     fetchEntreprises();
@@ -40,11 +42,16 @@ function CandidatureForm() {
       setFormData({
         titre_poste: data.titre_poste || '',
         entreprise_id: data.entreprise_id?._id || data.entreprise_id || '',
+        nom_entreprise: '',
         url_offre: data.url_offre || '',
         date_candidature: new Date(data.date_candidature).toISOString().split('T')[0],
         statut: data.statut || 'Envoyé',
         notes: data.notes || ''
       });
+      // Si une entreprise est associée, ne pas utiliser le mode nouvelle entreprise
+      if (data.entreprise_id) {
+        setUseNewEntreprise(false);
+      }
     } catch (err) {
       setError(err.message || 'Erreur lors de la récupération de la candidature');
     } finally {
@@ -60,14 +67,44 @@ function CandidatureForm() {
     }));
   };
 
+  const handleEntrepriseChange = (e) => {
+    const { value } = e.target;
+    if (value === 'nouvelle') {
+      setUseNewEntreprise(true);
+      setFormData(prev => ({
+        ...prev,
+        entreprise_id: '',
+        nom_entreprise: ''
+      }));
+    } else {
+      setUseNewEntreprise(false);
+      setFormData(prev => ({
+        ...prev,
+        entreprise_id: value,
+        nom_entreprise: ''
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      if (id) {
-        await updateCandidature(id, formData);
+      
+      // Préparer les données à envoyer
+      const candidatureData = { ...formData };
+      
+      // Si on utilise une nouvelle entreprise, envoyer nom_entreprise au lieu de entreprise_id
+      if (useNewEntreprise) {
+        delete candidatureData.entreprise_id;
       } else {
-        await createCandidature(formData);
+        delete candidatureData.nom_entreprise;
+      }
+      
+      if (id) {
+        await updateCandidature(id, candidatureData);
+      } else {
+        await createCandidature(candidatureData);
       }
       navigate(id ? `/candidatures/${id}` : '/');
     } catch (err) {
@@ -104,21 +141,36 @@ function CandidatureForm() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="entreprise_id">Entreprise *</label>
-            <select
-              id="entreprise_id"
-              name="entreprise_id"
-              value={formData.entreprise_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Sélectionnez une entreprise</option>
-              {entreprises.map(entreprise => (
-                <option key={entreprise._id} value={entreprise._id}>
-                  {entreprise.nom}
-                </option>
-              ))}
-            </select>
+            <label htmlFor="entreprise">Entreprise *</label>
+            <div className="flex" style={{ gap: '10px', alignItems: 'center' }}>
+              <select
+                id="entreprise"
+                name="entreprise"
+                value={useNewEntreprise ? 'nouvelle' : formData.entreprise_id}
+                onChange={handleEntrepriseChange}
+                style={{ flex: 1 }}
+              >
+                <option value="">Sélectionnez une entreprise existante</option>
+                {entreprises.map(entreprise => (
+                  <option key={entreprise._id} value={entreprise._id}>
+                    {entreprise.nom}
+                  </option>
+                ))}
+                <option value="nouvelle">+ Créer une nouvelle entreprise</option>
+              </select>
+              
+              {useNewEntreprise && (
+                <input
+                  type="text"
+                  name="nom_entreprise"
+                  value={formData.nom_entreprise}
+                  onChange={handleChange}
+                  placeholder="Nom de la nouvelle entreprise"
+                  required
+                  style={{ flex: 2 }}
+                />
+              )}
+            </div>
           </div>
 
           <div className="form-group">

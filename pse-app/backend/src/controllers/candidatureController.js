@@ -4,17 +4,29 @@ const Entreprise = require('../models/Entreprise');
 // Créer une nouvelle candidature
 const createCandidature = async (req, res) => {
   try {
-    const { titre_poste, entreprise_id, url_offre, date_candidature, statut, notes } = req.body;
+    const { titre_poste, entreprise_id, nom_entreprise, url_offre, date_candidature, statut, notes } = req.body;
 
-    // Vérifier si l'entreprise existe
-    const entreprise = await Entreprise.findById(entreprise_id);
-    if (!entreprise) {
-      return res.status(404).json({ message: 'Entreprise non trouvée' });
+    let entreprise;
+    
+    // Si un nom d'entreprise est fourni, créer une nouvelle entreprise
+    if (nom_entreprise) {
+      // Vérifier si une entreprise avec ce nom existe déjà
+      entreprise = await Entreprise.findOne({ nom: nom_entreprise });
+      if (!entreprise) {
+        entreprise = new Entreprise({ nom: nom_entreprise });
+        await entreprise.save();
+      }
+    } else {
+      // Sinon, vérifier si l'entreprise_id existe
+      entreprise = await Entreprise.findById(entreprise_id);
+      if (!entreprise) {
+        return res.status(404).json({ message: 'Entreprise non trouvée' });
+      }
     }
 
     const nouvelleCandidature = new Candidature({
       titre_poste,
-      entreprise_id,
+      entreprise_id: entreprise._id,
       url_offre,
       date_candidature: date_candidature || new Date(),
       statut: statut || 'Envoyé',
