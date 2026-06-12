@@ -1,0 +1,152 @@
+# 📁 PSE - Application de Suivi de Candidatures
+# Fichier .gitignore pour exclure les fichiers générés, temporaires et sensibles
+
+# ====================
+# GÉNÉRAL
+# ====================
+
+# Systèmes d'exploitation
+.DS_Store
+Thumbs.db
+
+# Fichiers de configuration locaux
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fichiers temporaires
+*.tmp
+*.temp
+
+# ====================
+# BACKEND (Node.js)
+# ====================
+
+# Dossier node_modules
+backend/node_modules/
+
+# Fichiers générés par npm
+backend/package-lock.json
+
+# Fichiers de build et cache
+backend/dist/
+backend/build/
+
+# Fichiers de log
+backend/logs/
+
+# Uploads (fichiers téléchargés par les utilisateurs)
+# Note: Ce dossier est monté en volume Docker, donc il est persistant
+# Mais on l'ignore dans Git pour éviter de commiter des fichiers utilisateurs
+backend/uploads/
+
+# Fichiers de configuration locaux
+backend/.env
+backend/.env.local
+
+# ====================
+# FRONTEND (React + Vite)
+# ====================
+
+# Dossier node_modules
+frontend/node_modules/
+
+# Fichiers générés par npm
+frontend/package-lock.json
+
+# Dossier de build Vite
+frontend/dist/
+
+# Cache Vite
+frontend/.vite/
+
+# Fichiers de configuration locaux
+frontend/.env
+frontend/.env.local
+
+# ====================
+# DOCKER
+# ====================
+
+# Fichiers générés par Docker
+.docker/
+
+# Volumes Docker (persistance des données)
+# Note: Ces dossiers sont gérés par Docker Compose
+# mais on les ignore dans Git
+docker-compose.override.yml
+
+# ====================
+# BASE DE DONNÉES (MongoDB)
+# ====================
+
+# Données MongoDB (gérées par Docker Volume)
+# Note: Ces données sont persistées via Docker Volume
+# mais on les ignore dans Git
+*.mdb
+*.db
+
+# ====================
+# IDE / ÉDITEURS
+# ====================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# WebStorm / IntelliJ
+.idea/
+*.iml
+*.ipr
+
+# Eclipse
+.project
+.classpath
+.bin/
+
+# ====================
+# SYSTÈMES DE BUILD
+# ====================
+
+# Coverage (tests)
+coverage/
+.nyc_output/
+
+# ====================
+# DOCUMENTATION GÉNÉRÉE
+# ====================
+
+# Si vous générez de la documentation automatiquement
+# (ex: avec JSDoc, TypeDoc, etc.)
+docs/generated/
+
+# ====================
+# FICHIERS TEMPORAIRES
+# ====================
+
+# Fichiers de backup
+*.bak
+*.backup
+
+# Fichiers de swap
+*.swp
+*.swo
+
+# ====================
+# EXCEPTIONS
+# ====================
+
+# Ne pas ignorer ces fichiers même s'ils correspondent aux patterns ci-dessus
+!.env.example
+!.gitignore
+!backend/package.json
+!frontend/package.json
+!docker-compose.yml
