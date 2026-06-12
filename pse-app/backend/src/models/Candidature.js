@@ -52,6 +52,10 @@ const candidatureSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    url_complete: {
+      type: String,
+      description: 'URL complète pour accéder au fichier'
+    },
     version: {
       type: String,
       default: '1.0'
