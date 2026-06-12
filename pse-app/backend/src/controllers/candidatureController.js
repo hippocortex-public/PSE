@@ -4,40 +4,57 @@ const Entreprise = require('../models/Entreprise');
 // Créer une nouvelle candidature
 const createCandidature = async (req, res) => {
   try {
+    console.log('Données reçues pour nouvelle candidature:', req.body);
+    
     const { titre_poste, entreprise_id, nom_entreprise, url_offre, date_candidature, statut, notes } = req.body;
 
     // Validation des champs obligatoires
     if (!titre_poste || titre_poste.trim() === '') {
+      console.log('Erreur: titre_poste manquant');
       return res.status(400).json({ message: 'Le titre du poste est obligatoire' });
     }
     
     if (!url_offre || url_offre.trim() === '') {
+      console.log('Erreur: url_offre manquante');
       return res.status(400).json({ message: 'Le lien de l\'offre est obligatoire' });
     }
     
     // Vérifier qu'une entreprise est fournie (soit ID, soit nom)
     if (!entreprise_id && !nom_entreprise) {
+      console.log('Erreur: aucune entreprise fournie (entreprise_id ou nom_entreprise)');
       return res.status(400).json({ message: 'Une entreprise est obligatoire (ID ou nom)' });
     }
+
+    console.log(`Entreprise: ID=${entreprise_id}, Nom=${nom_entreprise}`);
 
     let entreprise;
     
     // Si un nom d'entreprise est fourni, créer une nouvelle entreprise
     if (nom_entreprise && nom_entreprise.trim() !== '') {
+      console.log(`Recherche ou création de l'entreprise: ${nom_entreprise.trim()}`);
       // Vérifier si une entreprise avec ce nom existe déjà
       entreprise = await Entreprise.findOne({ nom: nom_entreprise.trim() });
       if (!entreprise) {
+        console.log(`Création de la nouvelle entreprise: ${nom_entreprise.trim()}`);
         entreprise = new Entreprise({ nom: nom_entreprise.trim() });
         await entreprise.save();
+        console.log(`Entreprise créée avec ID: ${entreprise._id}`);
+      } else {
+        console.log(`Entreprise existante trouvée avec ID: ${entreprise._id}`);
       }
     } else {
+      console.log(`Recherche de l'entreprise par ID: ${entreprise_id}`);
       // Sinon, vérifier si l'entreprise_id existe
       entreprise = await Entreprise.findById(entreprise_id);
       if (!entreprise) {
+        console.log(`Erreur: entreprise non trouvée avec ID: ${entreprise_id}`);
         return res.status(404).json({ message: 'Entreprise non trouvée' });
       }
+      console.log(`Entreprise trouvée avec ID: ${entreprise._id}`);
     }
 
+    console.log(`Création de la candidature avec entreprise_id: ${entreprise._id}`);
+    
     const nouvelleCandidature = new Candidature({
       titre_poste: titre_poste.trim(),
       entreprise_id: entreprise._id,
@@ -56,6 +73,7 @@ const createCandidature = async (req, res) => {
     });
 
     await nouvelleCandidature.save();
+    console.log(`Candidature créée avec succès: ${nouvelleCandidature._id}`);
     res.status(201).json(nouvelleCandidature);
   } catch (error) {
     console.error('Erreur lors de la création de la candidature:', error);

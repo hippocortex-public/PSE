@@ -32,7 +32,8 @@ const entrepriseSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Le nom de l\'entreprise est obligatoire'],
     trim: true,
-    unique: true
+    unique: true,
+    index: true  // Remplace l'index explicite plus bas
   },
   site_web: {
     type: String,
@@ -47,7 +48,8 @@ const entrepriseSchema = new mongoose.Schema({
   },
   secteur: {
     type: String,
-    trim: true
+    trim: true,
+    index: true  // Index directement dans le champ
   },
   taille: {
     type: String,
@@ -74,9 +76,7 @@ const entrepriseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index pour optimiser les requêtes
-entrepriseSchema.index({ nom: 1 });
-entrepriseSchema.index({ secteur: 1 });
+// Pas besoin de définir les index ici car ils sont déjà définis dans les champs
 
 const Entreprise = mongoose.model('Entreprise', entrepriseSchema);
 
