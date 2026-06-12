@@ -15,9 +15,10 @@ function CandidatureForm() {
     notes: ''
   });
   const [entreprises, setEntreprises] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [useNewEntreprise, setUseNewEntreprise] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchEntreprises();
@@ -28,10 +29,14 @@ function CandidatureForm() {
 
   const fetchEntreprises = async () => {
     try {
+      setLoading(true);
       const data = await getEntreprises();
       setEntreprises(data.data || []);
+      setError(null);
     } catch (err) {
       setError(err.message || 'Erreur lors de la récupération des entreprises');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,6 +57,7 @@ function CandidatureForm() {
       if (data.entreprise_id) {
         setUseNewEntreprise(false);
       }
+      setError(null);
     } catch (err) {
       setError(err.message || 'Erreur lors de la récupération de la candidature');
     } finally {
@@ -89,7 +95,8 @@ function CandidatureForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setSubmitting(true);
+      setError(null);
       
       // Préparer les données à envoyer
       const candidatureData = { ...formData };
@@ -99,7 +106,7 @@ function CandidatureForm() {
         // Vérifier que nom_entreprise est fourni
         if (!candidatureData.nom_entreprise || candidatureData.nom_entreprise.trim() === '') {
           setError('Veuillez entrer un nom pour la nouvelle entreprise');
-          setLoading(false);
+          setSubmitting(false);
           return;
         }
         delete candidatureData.entreprise_id;
@@ -107,7 +114,7 @@ function CandidatureForm() {
         // Vérifier que entreprise_id est fourni
         if (!candidatureData.entreprise_id || candidatureData.entreprise_id.trim() === '') {
           setError('Veuillez sélectionner une entreprise');
-          setLoading(false);
+          setSubmitting(false);
           return;
         }
         delete candidatureData.nom_entreprise;
@@ -116,13 +123,13 @@ function CandidatureForm() {
       // Vérifier que tous les champs obligatoires sont présents
       if (!candidatureData.titre_poste || candidatureData.titre_poste.trim() === '') {
         setError('Le titre du poste est obligatoire');
-        setLoading(false);
+        setSubmitting(false);
         return;
       }
       
       if (!candidatureData.url_offre || candidatureData.url_offre.trim() === '') {
         setError('Le lien de l\'offre est obligatoire');
-        setLoading(false);
+        setSubmitting(false);
         return;
       }
       
@@ -136,7 +143,7 @@ function CandidatureForm() {
       console.error('Erreur détaillée:', err);
       setError(err.message || err.response?.data?.message || 'Erreur lors de la sauvegarde');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -253,11 +260,11 @@ function CandidatureForm() {
           </div>
 
           <div className="flex-between mt-20">
-            <button type="button" className="btn btn-secondary" onClick={() => navigate('/')}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate('/')} disabled={submitting}>
               Annuler
             </button>
-            <button type="submit" className="btn" disabled={loading}>
-              {loading ? 'En cours...' : (id ? 'Mettre à jour' : 'Créer')}
+            <button type="submit" className="btn" disabled={submitting}>
+              {submitting ? 'En cours...' : (id ? 'Mettre à jour' : 'Créer')}
             </button>
           </div>
         </form>
