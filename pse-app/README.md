@@ -3,6 +3,7 @@
 [English Version Below](#english-version)
 
 Une application complète pour centraliser et gérer vos candidatures, entreprises et préparations d'entretien.
+Cette applicaton est actuellement à usage personnel et entierement vibe codé avec Mitral Code
 
 ## 🚀 Démarrage Rapide
 
@@ -312,6 +313,7 @@ Pour toute question ou problème, veuillez ouvrir une issue dans le dépôt GitH
 # PSE - Application Tracking Application
 
 A comprehensive application to centralize and manage your job applications, companies, and interview preparations.
+This application is currently for personal use and is entirely coded with Mitral Code.
 
 ## 🚀 Quick Start
 
