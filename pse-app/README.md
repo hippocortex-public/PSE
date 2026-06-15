@@ -1,5 +1,7 @@
 # PSE - Application de Suivi de Candidatures
 
+[English Version Below](#english-version)
+
 Une application complète pour centraliser et gérer vos candidatures, entreprises et préparations d'entretien.
 
 ## 🚀 Démarrage Rapide
@@ -302,3 +304,312 @@ Les contributions sont les bienvenues ! Ouvrez une issue ou soumettez une pull r
 ## 📞 Support
 
 Pour toute question ou problème, veuillez ouvrir une issue dans le dépôt GitHub.
+
+---
+
+# English Version
+
+# PSE - Application Tracking Application
+
+A comprehensive application to centralize and manage your job applications, companies, and interview preparations.
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker
+- Docker Compose
+
+### Installation and Launch
+
+1. **Clone the project** (if not already done):
+   ```bash
+   git clone <repository-url>
+   cd pse-app
+   ```
+
+2. **Launch the application with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the application**:
+   - Frontend: [http://localhost:5173](http://localhost:5173)
+   - Backend API: [http://localhost:3000](http://localhost:3000)
+   - MongoDB: [mongodb://localhost:27017](mongodb://localhost:27017)
+
+4. **Stop the application**:
+   ```bash
+   docker-compose down
+   ```
+
+## 📂 Project Structure
+
+```
+pse-app/
+├── backend/               # Node.js + Express API
+│   ├── src/
+│   │   ├── models/        # MongoDB schemas
+│   │   ├── routes/        # API routes
+│   │   ├── controllers/   # Business logic
+│   │   ├── middlewares/   # Middlewares (upload, etc.)
+│   │   └── app.js         # Entry point
+│   ├── uploads/           # Document storage
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend/              # React application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── pages/         # Application pages
+│   │   ├── services/      # API calls (Axios)
+│   │   ├── App.jsx        # Main routing
+│   │   └── main.jsx       # Entry point
+│   ├── Dockerfile
+│   └── package.json
+│
+├── docker-compose.yml     # Docker orchestration
+└── README.md              # Documentation
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+#### Backend
+Create a `.env` file in the `backend/` folder based on `.env.example`:
+```env
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+MONGO_URI=mongodb://mongodb:27017/pse-app
+```
+
+#### Frontend
+The frontend uses a proxy to the backend (configured in `vite.config.js`).
+
+## 📡 Backend API
+
+### Available Endpoints
+
+#### Applications
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/candidatures` | List all applications |
+| POST | `/api/candidatures` | Create a new application |
+| GET | `/api/candidatures/:id` | Get an application |
+| PUT | `/api/candidatures/:id` | Update an application |
+| DELETE | `/api/candidatures/:id` | Delete an application |
+| PUT | `/api/candidatures/:id/statut` | Update status |
+| POST | `/api/candidatures/:id/documents` | Add a document |
+| DELETE | `/api/candidatures/:id/documents/:documentId` | Delete a document |
+
+#### Companies
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/entreprises` | List all companies |
+| POST | `/api/entreprises` | Create a new company |
+| GET | `/api/entreprises/:id` | Get a company |
+| PUT | `/api/entreprises/:id` | Update a company |
+| DELETE | `/api/entreprises/:id` | Delete a company |
+
+#### Preparation Sections
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/entreprises/:id/sections` | Add a section |
+| PUT | `/api/entreprises/:id/sections/:sectionId` | Update a section |
+| DELETE | `/api/entreprises/:id/sections/:sectionId` | Delete a section |
+| PUT | `/api/entreprises/:id/sections/reorder` | Reorder sections |
+
+#### Document Upload
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/upload` | Upload a document (CV, letter) |
+
+### Request Examples
+
+#### Create a company
+```bash
+curl -X POST http://localhost:3000/api/entreprises \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nom": "Google",
+    "secteur": "Technology",
+    "site_web": "https://google.com",
+    "taille": "10000+ employees"
+  }'
+```
+
+#### Create an application
+```bash
+curl -X POST http://localhost:3000/api/candidatures \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titre_poste": "Full Stack Developer",
+    "entreprise_id": "COMPANY_ID",
+    "url_offre": "https://example.com/offer",
+    "date_candidature": "2026-06-15",
+    "statut": "Sent"
+  }'
+```
+
+#### Upload a document
+```bash
+curl -X POST http://localhost:3000/api/upload \
+  -F "candidature_id=APPLICATION_ID" \
+  -F "type_document=CV" \
+  -F "document=@/path/to/my_cv.pdf"
+```
+
+## 🎨 Frontend Features
+
+### Available Pages
+- **Dashboard** (`/`): List of applications with filters
+- **Create/Edit Application** (`/candidatures/new`, `/candidatures/:id/edit`)
+- **Application Details** (`/candidatures/:id`): With status history and document management
+- **Companies List** (`/entreprises`): With filters
+- **Create/Edit Company** (`/entreprises/new`, `/entreprises/:id/edit`)
+- **Company Details** (`/entreprises/:id`): With modular preparation sections
+
+### Status Management
+Available statuses are:
+- Sent
+- Response received
+- Interview
+- Rejection
+
+Each status change is recorded in the history with a date and optional comment.
+
+### Document Management
+- Upload CV and cover letters (PDF, DOC, DOCX)
+- Local storage in `backend/uploads/`
+- Direct file access via API
+
+### Preparation Sections
+Companies can have customized preparation sections:
+- Key figures
+- Sector and trends
+- Competitors
+- Values and culture
+- Historical facts
+- Questions to ask
+- Points of caution
+
+## 📊 Data Model
+
+### Application
+```javascript
+{
+  titre_poste: String,
+  entreprise_id: ObjectId,
+  url_offre: String,
+  date_candidature: Date,
+  statut: String, // ['Sent', 'Response received', 'Interview', 'Rejection']
+  notes: String,
+  documents: [
+    {
+      type_document: String, // ['CV', 'Cover letter']
+      nom_fichier: String,
+      chemin_fichier: String,
+      version: String,
+      date_ajout: Date
+    }
+  ],
+  historique_statut: [
+    {
+      ancien_statut: String,
+      nouveau_statut: String,
+      date_changement: Date,
+      commentaire: String
+    }
+  ]
+}
+```
+
+### Company
+```javascript
+{
+  nom: String,
+  site_web: String,
+  secteur: String,
+  taille: String,
+  chiffre_affaires: String,
+  organisation: String,
+  valeurs: String,
+  historique_court: String,
+  sections_preparation: [
+    {
+      type_section: String,
+      titre: String,
+      contenu: String,
+      ordre: Number,
+      actif: Boolean
+    }
+  ]
+}
+```
+
+## 🛠 Local Development (without Docker)
+
+### Backend
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## 📦 Dependencies
+
+### Backend
+- express
+- mongoose
+- multer
+- cors
+- dotenv
+- nodemon (dev)
+
+### Frontend
+- react
+- react-dom
+- react-router-dom
+- axios
+- vite
+- @vitejs/plugin-react
+
+## 🎯 Roadmap
+
+### Current MVP
+- [x] Complete application management (CRUD)
+- [x] Complete company management (CRUD)
+- [x] Status history
+- [x] Document upload
+- [x] Modular preparation sections
+- [x] Simple and functional user interface
+- [x] Complete Dockerization
+
+### Future Improvements
+- [ ] User authentication
+- [ ] LinkedIn synchronization (partial)
+- [ ] Advanced search and filters
+- [ ] Data export (PDF, CSV)
+- [ ] Notifications and reminders
+- [ ] Drag-and-drop interface for sections
+- [ ] Dark/light theme
+- [ ] Unit and integration tests
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Contributing
+
+Contributions are welcome! Open an issue or submit a pull request.
+
+## 📞 Support
+
+For any questions or issues, please open an issue in the GitHub repository.
