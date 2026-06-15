@@ -6,8 +6,13 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    // ✅ Configuration correcte (toutes les routes /api sont proxyfiées)
     proxy: {
       '/api': {
+        target: 'http://backend:3000',
+        changeOrigin: true,
+        },
+      '/uploads': {
         target: 'http://backend:3000',
         changeOrigin: true,
       },

@@ -5,6 +5,7 @@ import CandidatureForm from './pages/CandidatureForm';
 import EntreprisesList from './pages/EntreprisesList';
 import EntrepriseDetail from './pages/EntrepriseDetail';
 import EntrepriseForm from './pages/EntrepriseForm';
+import RechercheAvancee from './pages/RechercheAvancee';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <ul>
             <li><Link to="/">Candidatures</Link></li>
             <li><Link to="/entreprises">Entreprises</Link></li>
+            <li><Link to="/recherche">Recherche Avancée</Link></li>
           </ul>
         </nav>
 
@@ -27,6 +29,7 @@ function App() {
             <Route path="/candidatures/new" element={<CandidatureForm />} />
             <Route path="/candidatures/:id" element={<CandidatureDetail />} />
             <Route path="/candidatures/:id/edit" element={<CandidatureForm />} />
+            <Route path="/recherche" element={<RechercheAvancee />} />
             
             <Route path="/entreprises" element={<EntreprisesList />} />
             <Route path="/entreprises/new" element={<EntrepriseForm />} />

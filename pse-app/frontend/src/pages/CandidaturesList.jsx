@@ -18,8 +18,9 @@ function CandidaturesList() {
       setLoading(true);
       const params = {};
       if (filterStatut) params.statut = filterStatut;
-      if (filterEntreprise) params.entreprise_id = filterEntreprise;
-      
+      if (filterEntreprise) params.nom_entreprise = filterEntreprise; // Ajout du filtre par nom d'entreprise
+
+
       const data = await getCandidatures(params);
       setCandidatures(data.data || []);
       setError(null);
@@ -30,6 +31,12 @@ function CandidaturesList() {
     }
   };
 
+  // Optionnel : Permettre la recherche avec la touche "Entrée"
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      fetchCandidatures();
+    }
+  };
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette candidature ?')) {
       try {
@@ -55,14 +62,6 @@ function CandidaturesList() {
         return 'badge';
     }
   };
-
-  if (loading) {
-    return <div>Chargement en cours...</div>;
-  }
-
-  if (error) {
-    return <div className="alert alert-error">{error}</div>;
-  }
 
   return (
     <div>
@@ -90,18 +89,24 @@ function CandidaturesList() {
             </select>
           </div>
           <div className="form-group" style={{ flex: 1 }}>
-            <label>Entreprise (ID)</label>
+            <label>Entreprise (Nom)</label>
             <input
               type="text"
               value={filterEntreprise}
               onChange={(e) => setFilterEntreprise(e.target.value)}
-              placeholder="ID de l'entreprise"
+              onKeyPress={handleKeyPress}
+              placeholder="Nom de l'entreprise"
             />
+            <button onClick={fetchCandidatures}>Rechercher</button>
           </div>
         </div>
       </div>
 
-      {candidatures.length === 0 ? (
+      {error && <div className="alert alert-error">{error}</div>}
+
+      {loading ? (
+        <div>Chargement en cours...</div>
+      ) : candidatures.length === 0 ? (
         <div className="card">
           <p>Aucune candidature trouvée.</p>
         </div>

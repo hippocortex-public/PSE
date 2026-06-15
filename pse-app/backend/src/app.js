@@ -38,7 +38,7 @@ mongoose.connect(MONGO_URI)
 // Routes
 app.use('/api/candidatures', candidatureRoutes);
 app.use('/api/entreprises', entrepriseRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Route de test
 app.get('/', (req, res) => {

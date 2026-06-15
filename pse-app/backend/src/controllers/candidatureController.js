@@ -86,11 +86,15 @@ const createCandidature = async (req, res) => {
 // Lister toutes les candidatures
 const getAllCandidatures = async (req, res) => {
   try {
-    const { statut, entreprise_id, limit = 10, page = 1 } = req.query;
+    const { statut, entreprise_id, nom_entreprise, limit = 10, page = 1 } = req.query;
     
     const query = {};
     if (statut) query.statut = statut;
     if (entreprise_id) query.entreprise_id = entreprise_id;
+    if (nom_entreprise) {
+      const entreprises = await Entreprise.find({ nom: { $regex: nom_entreprise, $options: 'i' } }, '_id');
+      query.entreprise_id = { $in: entreprises.map(e => e._id) };
+    }
 
     const candidatures = await Candidature.find(query)
       .populate('entreprise_id', 'nom secteur')
@@ -249,6 +253,35 @@ const deleteDocument = async (req, res) => {
   }
 };
 
+// Recherche avancée avec filtres
+const rechercheAvancee = async (req, res) => {
+  try {
+    const { poste, statut, entreprise, dateMin, dateMax, competences } = req.query;
+
+    // Construire l'objet de filtre pour MongoDB
+    const filtre = {};
+
+    if (poste) filtre.poste = { $regex: poste, $options: 'i' }; // Recherche insensible à la casse
+    if (statut) filtre.statut = statut;
+    if (entreprise) filtre.entreprise = { $regex: entreprise, $options: 'i' };
+    if (dateMin || dateMax) {
+      filtre.dateCandidature = {};
+      if (dateMin) filtre.dateCandidature.$gte = new Date(dateMin);
+      if (dateMax) filtre.dateCandidature.$lte = new Date(dateMax);
+    }
+    if (competences) {
+      // Supposons que competences est un tableau dans le modèle
+      filtre.competences = { $in: competences.split(',') };
+    }
+
+    // Exécuter la requête
+    const candidatures = await Candidature.find(filtre);
+    res.json(candidatures);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la recherche', error: err.message });
+  }
+};
+
 module.exports = {
   createCandidature,
   getAllCandidatures,
@@ -257,5 +290,6 @@ module.exports = {
   deleteCandidature,
   updateStatut,
   addDocument,
-  deleteDocument
+  deleteDocument,
+  rechercheAvancee
 };

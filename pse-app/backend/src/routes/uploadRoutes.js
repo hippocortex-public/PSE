@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { upload, handleUploadError } = require('../middlewares/uploadMiddleware');
 const Candidature = require('../models/Candidature');
+const path = require('path'); 
 
 // Route pour uploader un document (CV ou lettre de motivation)
 router.post('/', upload.single('document'), handleUploadError, async (req, res) => {
@@ -42,5 +43,9 @@ router.post('/', upload.single('document'), handleUploadError, async (req, res) 
     res.status(500).json({ message: error.message });
   }
 });
-
+// Route pour servir les fichiers uploadés
+router.get('/:filename', (req, res) => {
+  const filePath = path.join(__dirname, '../../uploads', req.params.filename);
+  res.sendFile(filePath);
+});
 module.exports = router;

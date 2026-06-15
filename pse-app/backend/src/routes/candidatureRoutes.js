@@ -8,6 +8,7 @@ router.get('/', candidatureController.getAllCandidatures);
 router.get('/:id', candidatureController.getCandidatureById);
 router.put('/:id', candidatureController.updateCandidature);
 router.delete('/:id', candidatureController.deleteCandidature);
+router.get('/recherche', candidatureController.rechercheAvancee);
 
 // Route pour mettre à jour le statut (avec historique)
 router.put('/:id/statut', candidatureController.updateStatut);
