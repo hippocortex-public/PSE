@@ -10,6 +10,8 @@ dotenv.config();
 // Importer les routes
 const candidatureRoutes = require('./routes/candidatureRoutes');
 const entrepriseRoutes = require('./routes/entrepriseRoutes');
+const projetRoutes = require('./routes/projetRoutes');
+const competenceRoutes = require('./routes/competenceRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 // Initialiser l'application Express
@@ -38,6 +40,8 @@ mongoose.connect(MONGO_URI)
 // Routes
 app.use('/api/candidatures', candidatureRoutes);
 app.use('/api/entreprises', entrepriseRoutes);
+app.use('/api/projets', projetRoutes);
+app.use('/api/competences', competenceRoutes);
 app.use('/api/uploads', uploadRoutes);
 
 // Route de test

@@ -7,16 +7,38 @@ function EntreprisesList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterSecteur, setFilterSecteur] = useState('');
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
   useEffect(() => {
-    fetchEntreprises();
+    // Annuler le timeout précédent si le filtre change
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Ne déclencher la recherche que si le filtre a au moins 3 caractères
+    if (filterSecteur.length >= 3 || filterSecteur.length === 0) {
+      const timeout = setTimeout(() => {
+        fetchEntreprises();
+      }, 500); // Attendre 500ms après la dernière saisie
+      setSearchTimeout(timeout);
+    }
+
+    // Nettoyer le timeout à la fin
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
   }, [filterSecteur]);
 
   const fetchEntreprises = async () => {
     try {
       setLoading(true);
       const params = {};
-      if (filterSecteur) params.secteur = filterSecteur;
+      // Envoyer la recherche au backend qui gère le regex
+      if (filterSecteur.length >= 3) {
+        params.secteur = filterSecteur;
+      }
       
       const data = await getEntreprises(params);
       setEntreprises(data.data || []);
@@ -59,12 +81,12 @@ function EntreprisesList() {
       <div className="card mb-20">
         <h3>Filtres</h3>
         <div className="form-group">
-          <label>Secteur</label>
+          <label>Secteur (min. 3 caractères)</label>
           <input
             type="text"
             value={filterSecteur}
             onChange={(e) => setFilterSecteur(e.target.value)}
-            placeholder="Filtrer par secteur"
+            placeholder="Saisir au moins 3 caractères pour filtrer..."
           />
         </div>
       </div>

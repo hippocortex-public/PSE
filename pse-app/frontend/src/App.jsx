@@ -6,6 +6,10 @@ import EntreprisesList from './pages/EntreprisesList';
 import EntrepriseDetail from './pages/EntrepriseDetail';
 import EntrepriseForm from './pages/EntrepriseForm';
 import RechercheAvancee from './pages/RechercheAvancee';
+import ProjetsList from './pages/ProjetsList';
+import ProjetDetail from './pages/ProjetDetail';
+import ProjetForm from './pages/ProjetForm';
+import CompetencesList from './pages/CompetencesList';
 
 function App() {
   return (
@@ -19,6 +23,8 @@ function App() {
           <ul>
             <li><Link to="/">Candidatures</Link></li>
             <li><Link to="/entreprises">Entreprises</Link></li>
+            <li><Link to="/projets">Projets</Link></li>
+            <li><Link to="/competences">Compétences</Link></li>
             <li><Link to="/recherche">Recherche Avancée</Link></li>
           </ul>
         </nav>
@@ -35,6 +41,13 @@ function App() {
             <Route path="/entreprises/new" element={<EntrepriseForm />} />
             <Route path="/entreprises/:id" element={<EntrepriseDetail />} />
             <Route path="/entreprises/:id/edit" element={<EntrepriseForm />} />
+            
+            <Route path="/projets" element={<ProjetsList />} />
+            <Route path="/projets/new" element={<ProjetForm />} />
+            <Route path="/projets/:id" element={<ProjetDetail />} />
+            <Route path="/projets/:id/edit" element={<ProjetForm />} />
+            
+            <Route path="/competences" element={<CompetencesList />} />
           </Routes>
         </div>
       </div>
