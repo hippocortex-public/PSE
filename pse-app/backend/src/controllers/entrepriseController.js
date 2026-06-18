@@ -46,7 +46,10 @@ const getAllEntreprises = async (req, res) => {
     const { secteur, limit = 10, page = 1 } = req.query;
     
     const query = {};
-    if (secteur) query.secteur = secteur;
+    if (secteur && secteur.length >= 3) {
+      // Recherche "LIKE" insensible à la casse avec regex
+      query.secteur = { $regex: secteur, $options: 'i' };
+    }
 
     const entreprises = await Entreprise.find(query)
       .sort({ nom: 1 })
